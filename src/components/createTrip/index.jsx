@@ -9,16 +9,20 @@ function CreateTrip() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState({
+    destination: "",
+    days: "",
+    budget: "",
+    travelWith: "",
+  });
   console.log(formData);
-  
 
   const handleInputChange = (inputValue) => {
-    setInputValue(inputValue); // Update the input value state
+    setInputValue(inputValue);
     if (inputValue) {
-      fetchLocations(inputValue); // Fetch locations when input changes
+      fetchLocations(inputValue);
     } else {
-      setOptions([]); // Clear options if input is empty
+      setOptions([]);
     }
   };
 
@@ -28,19 +32,39 @@ function CreateTrip() {
         `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
       );
       const places = response.data.map((place) => ({
-        label: place.display_name, // Ensure this is a string
+        label: place.display_name,
+        value: place.display_name,
       }));
       setOptions(places);
     } catch (error) {
       console.error("Error fetching locations:", error);
-      setOptions([]); // Reset options on error
+      setOptions([]);
     }
   };
 
   const handleChange = (selectedOption) => {
     setSelectedPlace(selectedOption);
-    console.log("Selected Place:", selectedOption);
-    setFormData({...formData,selectedOption})
+    setFormData((prev) => ({ ...prev, destination: selectedOption.value }));
+  };
+
+  const handleDaysChange = (e) => {
+    setFormData((prev) => ({ ...prev, days: e.target.value }));
+  };
+
+  const handleBudgetSelect = (budget) => {
+    setFormData((prev) => ({ ...prev, budget }));
+  };
+
+  const handleTravelSelect = (travelWith) => {
+    setFormData((prev) => ({ ...prev, travelWith }));
+  };
+
+  const onGenerate = () => {
+    const day = Number(formData.days)
+    if (day > 5) {
+      console.log("Number of days should be less than 5");
+      return;
+    }
   };
 
   return (
@@ -60,15 +84,15 @@ function CreateTrip() {
           </h2>
           <Select
             options={options}
-            onInputChange={handleInputChange} // Handle input changes
-            onChange={handleChange} // Handle selection changes
-            inputValue={inputValue} // Controlled input value
+            onInputChange={handleInputChange}
+            onChange={handleChange}
+            inputValue={inputValue}
             placeholder="Enter location"
-            noOptionsMessage={() => "No locations found"} // Custom message when no options are available
+            noOptionsMessage={() => "No locations found"}
           />
           {selectedPlace && (
             <p className="mt-2 text-gray-600">
-              Selected: {selectedPlace.label || "Location not found"}
+              Selected: {selectedPlace.label}
             </p>
           )}
         </div>
@@ -77,7 +101,12 @@ function CreateTrip() {
           <h2 className="text-xl font-medium my-3">
             How many days are you planning your trip?
           </h2>
-          <Input placeholder={"Ex. 3"} onChange={(e)=>{formData(e.target.value)}} type="number" />
+          <Input
+            placeholder="Ex. 3"
+            type="number"
+            value={formData.days}
+            onChange={handleDaysChange}
+          />
         </div>
 
         <div>
@@ -85,8 +114,11 @@ function CreateTrip() {
           <div className="grid grid-cols-3 mt-5 gap-5">
             {budgetOptions.map((item) => (
               <div
-                className="rounded-lg border p-4 cursor-pointer hover:shadow-lg"
                 key={item.id}
+                className={`rounded-lg border p-4 cursor-pointer hover:shadow-lg ${
+                  formData.budget === item.title ? "border-blue-500" : ""
+                }`}
+                onClick={() => handleBudgetSelect(item.title)}
               >
                 <h2 className="text-4xl">{item.icon}</h2>
                 <h2 className="text-lg font-bold">{item.title}</h2>
@@ -103,19 +135,22 @@ function CreateTrip() {
           <div className="grid grid-cols-3 mt-5 gap-5">
             {selectTravelsList.map((item) => (
               <div
-                className="rounded-lg border p-4 cursor-pointer hover:shadow-lg"
                 key={item.id}
+                className={`rounded-lg border p-4 cursor-pointer hover:shadow-lg ${
+                  formData.travelWith === item.people ? "border-blue-500" : ""
+                }`}
+                onClick={() => handleTravelSelect(item.people)}
               >
                 <h2 className="text-4xl">{item.icon}</h2>
                 <h2 className="text-lg font-bold">{item.title}</h2>
                 <h2 className="text-sm text-gray-500">{item.desc}</h2>
-                {/* <h2 className="text-sm text-gray-500">{item.people}</h2> */}
               </div>
             ))}
           </div>
         </div>
+
         <div className="flex justify-end my-20">
-          <Button>Generate Trip</Button>
+          <Button onClick={onGenerate}>Generate Trip</Button>
         </div>
       </div>
     </div>
