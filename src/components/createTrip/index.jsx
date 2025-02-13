@@ -3,15 +3,30 @@ import Select from "react-select";
 import axios from "axios";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { AI_PROMPT, budgetOptions, selectTravelsList } from "../../constants/option";
+import {
+  AI_PROMPT,
+  budgetOptions,
+  selectTravelsList,
+} from "../../constants/option";
 import { useToast } from "@/hooks/use-toast";
 import { chatSession } from "@/services/AiModel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
 
 function CreateTrip() {
-  const {toast} = useToast();
+  const { toast } = useToast();
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [openDialouge, setOpenDialouge] = useState(false);
   const [formData, setFormData] = useState({
     destination: "",
     days: "",
@@ -62,41 +77,70 @@ function CreateTrip() {
     setFormData((prev) => ({ ...prev, travelWith }));
   };
 
+  const login = useGoogleLogin({
+    onSuccess: (res) => getUserDetails(res),
+    onError: (error) => console.log(error),
+  });
+
+  const getUserDetails = async (tokenInfo) => {
+    await axios
+      .get(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo?.access_token}`,
+            Accept: "Application/json",
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        localStorage.setItem("user", JSON.stringify(res.data));
+        setOpenDialouge(false)
+        onGenerate();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const onGenerate = async () => {
-    const day = Number(formData.days)
+    const user = localStorage.getItem("user");
+
+    if (!user) {
+      setOpenDialouge(true);
+      return;
+    }
+
+    const day = Number(formData.days);
     if (day > 5) {
       toast({
-        title : "Error",
-        description : "Number of days should be less than 5",
-        variant : "destructive"
-      })
+        title: "Error",
+        description: "Number of days should be less than 5",
+        variant: "destructive",
+      });
       return;
     }
-    if (!formData.destination || !formData.budget || !formData.travelWith){
+    if (!formData.destination || !formData.budget || !formData.travelWith) {
       toast({
-        title : "Error",
-        description : "Please fill all the details",
-        variant : "destructive"
-      })
+        title: "Error",
+        description: "Please fill all the details",
+        variant: "destructive",
+      });
       return;
     }
-    const FINAL_PROMPT = AI_PROMPT
-    .replace('{location}',formData?.destination)
-    .replace('{totalDays}',formData?.days)
-    .replace('{traveler}',formData?.travelWith)
-    .replace('{budget}',formData?.budget)
-    .replace('{totalDays}',formData?.days)
-
+    const FINAL_PROMPT = AI_PROMPT.replace("{location}", formData?.destination)
+      .replace("{totalDays}", formData?.days)
+      .replace("{traveler}", formData?.travelWith)
+      .replace("{budget}", formData?.budget)
+      .replace("{totalDays}", formData?.days);
 
     console.log(FINAL_PROMPT);
 
-    const result = await chatSession.sendMessage(FINAL_PROMPT)
+    const result = await chatSession.sendMessage(FINAL_PROMPT);
 
     console.log(result.response.text());
-    
   };
-
-  
 
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-72 px-5 mt-10">
@@ -183,6 +227,29 @@ function CreateTrip() {
         <div className="flex justify-end my-20">
           <Button onClick={onGenerate}>Generate Trip</Button>
         </div>
+
+        <Dialog open={openDialouge}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogDescription>
+                <div className="flex items-center">
+                  <img src="logo.svg" />
+                  <h1 className="text-black">voyage</h1>
+                </div>
+                <h2 className="font-bold mt-5 text-lg">Sign In With Google</h2>
+                <p>Sign in to the App with Google authentication securely</p>
+
+                <Button
+                  onClick={login}
+                  className="w-full mt-5 flex gap-4 items-center"
+                >
+                  <FcGoogle className="h-7 w-7" />
+                  Sign In with google
+                </Button>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
