@@ -3,9 +3,12 @@ import Select from "react-select";
 import axios from "axios";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { budgetOptions, selectTravelsList } from "../../constants/option";
+import { AI_PROMPT, budgetOptions, selectTravelsList } from "../../constants/option";
+import { useToast } from "@/hooks/use-toast";
+import { chatSession } from "@/services/AiModel";
 
 function CreateTrip() {
+  const {toast} = useToast();
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -59,13 +62,41 @@ function CreateTrip() {
     setFormData((prev) => ({ ...prev, travelWith }));
   };
 
-  const onGenerate = () => {
+  const onGenerate = async () => {
     const day = Number(formData.days)
     if (day > 5) {
-      console.log("Number of days should be less than 5");
+      toast({
+        title : "Error",
+        description : "Number of days should be less than 5",
+        variant : "destructive"
+      })
       return;
     }
+    if (!formData.destination || !formData.budget || !formData.travelWith){
+      toast({
+        title : "Error",
+        description : "Please fill all the details",
+        variant : "destructive"
+      })
+      return;
+    }
+    const FINAL_PROMPT = AI_PROMPT
+    .replace('{location}',formData?.destination)
+    .replace('{totalDays}',formData?.days)
+    .replace('{traveler}',formData?.travelWith)
+    .replace('{budget}',formData?.budget)
+    .replace('{totalDays}',formData?.days)
+
+
+    console.log(FINAL_PROMPT);
+
+    const result = await chatSession.sendMessage(FINAL_PROMPT)
+
+    console.log(result.response.text());
+    
   };
+
+  
 
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-72 px-5 mt-10">
