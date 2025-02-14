@@ -21,9 +21,11 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { doc, setDoc } from "firebase/firestore";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { db } from "@/services/FirebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 function CreateTrip() {
   const { toast } = useToast();
+  const route = useNavigate()
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -160,6 +162,7 @@ function CreateTrip() {
     });
 
     setLoading(false);
+    route('/view-trip/'+docId)
   };
 
   return (
