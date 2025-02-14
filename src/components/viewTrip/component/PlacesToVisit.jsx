@@ -13,31 +13,33 @@ const PlacesToVisit = ({ trip }) => {
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {item.activities.map((eachDay, index) => (
-                <div
-                  key={index}
-                  className="border rounded-xl p-4 hover:scale-105 hover:shadow-md cursor-pointer transition-all"
-                >
+                <Link key={index} to={`https://www.google.com/maps/search/?api=1&query=${eachDay.placeName}`} target="_blank">
+                  <div
+                    key={index}
+                    className="border rounded-xl p-4 hover:scale-105 hover:shadow-md cursor-pointer transition-all"
+                  >
                     {/* <h1 className="text-lg my-3 text-orange-500 font-bold">{eachDay.duration}</h1> */}
-                  <img
-                    className="h-[150px] w-full object-cover rounded-lg mb-3"
-                    src="/travel.jpg"
-                    alt=""
-                  />
-                  <div>
-                    <h1 className="text-lg font-semibold text-black">
-                      {eachDay.placeName}
-                    </h1>
-                    <p className="text-sm text-gray-500">
-                      {eachDay.placeDetails}
-                    </p>
-                    <h2 className="text-gray-600">
-                      🕛 {eachDay.travelTimeFromHotel}
-                    </h2>
-                    <h2 className="text-gray-600">
-                      🎟️ {eachDay.ticketPricing}
-                    </h2>
+                    <img
+                      className="h-[150px] w-full object-cover rounded-lg mb-3"
+                      src="/travel.jpg"
+                      alt=""
+                    />
+                    <div>
+                      <h1 className="text-lg font-semibold text-black">
+                        {eachDay.placeName}
+                      </h1>
+                      <p className="text-sm text-gray-500">
+                        {eachDay.placeDetails}
+                      </p>
+                      <h2 className="text-gray-600">
+                        🕛 {eachDay.travelTimeFromHotel}
+                      </h2>
+                      <h2 className="text-gray-600">
+                        🎟️ {eachDay.ticketPricing}
+                      </h2>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

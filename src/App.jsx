@@ -5,6 +5,7 @@ import Header from "./components/custom/Header";
 import { Toaster } from "./components/ui/toaster";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ViewTrip from "./components/viewTrip/[tripId]";
+import MyTrips from "./components/myTrips";
 function App() {
   return (
     <Router>
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/create-trip" element={<CreateTrip />} />
           <Route path="/view-trip/:tripId" element={<ViewTrip/>}/>
+          <Route path="/my-trips" element={<MyTrips/>}/>
         </Routes>
       </GoogleOAuthProvider>
     </Router>
