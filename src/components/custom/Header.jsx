@@ -19,10 +19,8 @@ import axios from "axios";
 const Header = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-  useEffect(() => {
-    console.log(user);
-  }, []);
-
+  console.log(user);
+  
   const [openDialouge, setOpenDialouge] = useState(false);
 
   const login = useGoogleLogin({
@@ -42,7 +40,6 @@ const Header = () => {
         }
       )
       .then((res) => {
-        console.log(res);
         localStorage.setItem("user", JSON.stringify(res.data));
         setOpenDialouge(false);
         window.location.reload();
@@ -53,75 +50,66 @@ const Header = () => {
   };
 
   return (
-    <div className="flex justify-between px-5 shadow-sm items-center">
-      <div className="">
-        <Link className="flex justify-center items-center" to={'/'}>
-          <img src="logo.svg" alt="" />
-          <h1 className="text-black">voyage</h1>
-        </Link>
-      </div>
+    <div className="flex justify-between items-center px-5 py-3 shadow-sm md:px-10 lg:px-20">
+      <Link className="flex items-center space-x-2" to={'/'}>
+        <img src="/logo.svg" alt="Logo" className="h-8" />
+        <h1 className="text-black font-bold text-lg">Voyage</h1>
+      </Link>
+      
       {user ? (
-        <>
-          <div className="flex justify-center items-center gap-4">
-            <Link to={"/create-trip"}>
-              <Button
-                variant={"outline"}
-                className="rounded-xl bg-white text-black hover:bg-gray-100"
-              >
-                + Create Trips
-              </Button>
-            </Link>
-            <Link to={'/my-trips'}>
-            <Button
-              variant={"outline"}
-              className="rounded-xl bg-white text-black hover:bg-gray-100"
-            >
+        <div className="flex items-center space-x-3 md:space-x-5">
+          <Link to={"/create-trip"}>
+            <Button className="rounded-xl bg-white text-black hover:bg-gray-100 px-3 text-sm md:text-base">
+              + Create Trips
+            </Button>
+          </Link>
+          <Link to={'/my-trips'}>
+            <Button className="rounded-xl bg-white text-black hover:bg-gray-100 px-3 text-sm md:text-base">
               My Trips
             </Button>
-            </Link>
-            <Popover>
-              <PopoverTrigger className="bg-transparent p-0">
-                <img
-                  className="h-[35px] w-[35px] rounded-full cursor-pointer"
-                  src={user.picture}
-                  alt=""
-                />
-              </PopoverTrigger>
-              <PopoverContent>
-                <h2
-                  className="cursor-pointer text-black hover:bg-gray-100 p-2 rounded-lg"
-                  onClick={() => {
-                    googleLogout();
-                    localStorage.clear();
-                    navigate("/");
-                  }}
-                >
-                  Logout
-                </h2>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </>
+          </Link>
+          <Popover>
+            <PopoverTrigger className="bg-transparent p-0">
+              <img
+                className="h-8 w-8 md:h-10 md:w-10 rounded-full cursor-pointer"
+                src={user?.picture}
+                alt="User"
+              />
+            </PopoverTrigger>
+            <PopoverContent>
+              <h2
+                className="cursor-pointer text-black hover:bg-gray-100 p-2 rounded-lg"
+                onClick={() => {
+                  googleLogout();
+                  localStorage.clear();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </h2>
+            </PopoverContent>
+          </Popover>
+        </div>
       ) : (
-        <Button onClick={() => setOpenDialouge(true)}>Sign In</Button>
+        <Button onClick={() => setOpenDialouge(true)} className="text-sm md:text-base">Sign In</Button>
       )}
+      
       <Dialog open={openDialouge}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription>
-              <div className="flex items-center">
-                <img src="logo.svg" />
-                <h1 className="text-black">voyage</h1>
+              <div className="flex items-center space-x-2">
+                <img src="logo.svg" className="h-8" alt="Logo" />
+                <h1 className="text-black font-bold text-lg">Voyage</h1>
               </div>
               <h2 className="font-bold mt-5 text-lg">Sign In With Google</h2>
               <p>Sign in to the App with Google authentication securely</p>
-
               <Button
                 onClick={login}
                 className="w-full mt-5 flex gap-4 items-center"
               >
                 <FcGoogle className="h-7 w-7" />
-                Sign In with google
+                Sign In with Google
               </Button>
             </DialogDescription>
           </DialogHeader>

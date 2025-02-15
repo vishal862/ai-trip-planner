@@ -11,6 +11,9 @@ const ViewTrip = () => {
 
   const [trip, setTrip] = useState([])
 
+  console.log(trip);
+  
+
   useEffect(() => {
     tripId&&getTripData();
   }, [tripId])
