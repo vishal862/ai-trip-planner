@@ -117,10 +117,10 @@ function CreateTrip() {
     }
 
     const day = Number(formData.days);
-    if (day > 5) {
+    if (day > 10) {
       toast({
         title: "Error",
-        description: "Number of days should be less than 5",
+        description: "Number of days should be less than 10",
         variant: "destructive",
       });
       return;
